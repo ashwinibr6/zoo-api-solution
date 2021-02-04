@@ -6,14 +6,23 @@ import com.galvanize.zoo.habitat.HabitatRepository;
 import com.galvanize.zoo.habitat.HabitatType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
+
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@AutoConfigureRestDocs(outputDir = "target/snippets")
 class AnimalControllerIT {
 
     @Autowired
@@ -51,7 +61,13 @@ class AnimalControllerIT {
             .andExpect(jsonPath("length()").value(1))
             .andExpect(jsonPath("[0].name").value("monkey"))
             .andExpect(jsonPath("[0].mood").value(Mood.UNHAPPY.name()))
-            .andExpect(jsonPath("[0].type").value(AnimalType.WALKING.name()));
+            .andExpect(jsonPath("[0].type").value(AnimalType.WALKING.name()))
+                .andDo(document("Animals", responseFields(
+                        fieldWithPath("[0].name").description("This is the name of animal"),
+                        fieldWithPath("[0].type").description("This is the type of animal"),
+                        fieldWithPath("[0].mood").description("This is the mood of animal"),
+                        fieldWithPath("[0].habitat").description("This is the habitat of animal")
+                )));
     }
 
     @Test
@@ -64,15 +80,26 @@ class AnimalControllerIT {
                 .content(objectMapper.writeValueAsString(input))
                 .contentType(MediaType.APPLICATION_JSON)
         )
-            .andExpect(status().isConflict());
+            .andExpect(status().isConflict())
+        .andDo(document("CreateExistingAnimal", requestFields(
+                fieldWithPath("name").description("This is the name of animal"),
+                fieldWithPath("type").description("This is the type of animal"),
+                fieldWithPath("mood").description("This is the mood of animal"),
+                fieldWithPath("habitat").description("This is the habitat of animal")
+        )))
+        .andDo(document("CreateExistingAnimal",responseHeaders()));
     }
 
     @Test
     void feed() throws Exception {
         animalRepository.save(new AnimalEntity("monkey", AnimalType.WALKING));
 
-        mockMvc.perform(post("/animals/monkey/feed"))
-            .andExpect(status().isOk());
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/animals/{name}/feed", "monkey"))
+            .andExpect(status().isOk())
+                .andDo(document("FeedAnimal", RequestDocumentation.pathParameters(
+                        parameterWithName("name").description("This is the name of animal")
+
+                )));
 
         mockMvc.perform(get("/animals"))
             .andExpect(status().isOk())

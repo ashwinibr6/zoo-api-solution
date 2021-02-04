@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/animals' -i -X POST \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -d '{"name":"monkey","type":"WALKING","mood":null,"habitat":null}'
+----

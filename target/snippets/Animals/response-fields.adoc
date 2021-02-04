@@ -1,0 +1,20 @@
+|===
+|Path|Type|Description
+
+|`+[0].name+`
+|`+String+`
+|This is the name of animal
+
+|`+[0].type+`
+|`+String+`
+|This is the type of animal
+
+|`+[0].mood+`
+|`+String+`
+|This is the mood of animal
+
+|`+[0].habitat+`
+|`+Null+`
+|This is the habitat of animal
+
+|===

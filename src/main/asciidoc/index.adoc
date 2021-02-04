@@ -1,0 +1,25 @@
+= Animal API
+
+Get All Animals
+
+.request
+include::{snippets}/Animals/http-request.adoc[]
+
+.response
+include::{snippets}/Animals/http-response.adoc[]
+
+Create Existing Animal
+
+.request
+include::{snippets}/CreateExistingAnimal/http-request.adoc[]
+
+.response
+include::{snippets}/CreateExistingAnimal/http-response.adoc[]
+
+Feed Animal
+
+.request
+include::{snippets}/FeedAnimal/http-request.adoc[]
+
+.response
+include::{snippets}/FeedAnimal/http-response.adoc[]
