@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  zoo_db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+  zoo_service_app:
+    image: zoo_service
+    ports:
+      - "1000:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dockercompose
+    depends_on:
+      - zoo_db
